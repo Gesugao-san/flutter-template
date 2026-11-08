@@ -23,7 +23,7 @@ dependencies:
   # Persistent key-value storage for user settings.
   shared_preferences: ^2.5.6
   # Provides CupertinoIcons, referenced by the framework's adaptive widgets.
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^2.0.0
 
 dev_dependencies:
   flutter_test:
