@@ -26,6 +26,26 @@ projects need:
 - **Self-contained web build**: the renderer is bundled with the app
   (`--no-web-resources-cdn`), nothing is loaded from Google's CDN.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/welcome.png" width="260" alt="First-run welcome screen"></td>
+    <td><img src="docs/screenshots/home.png" width="260" alt="Home screen, dark theme, Russian"></td>
+    <td><img src="docs/screenshots/settings.png" width="260" alt="Settings screen"></td>
+  </tr>
+  <tr>
+    <td align="center">First launch</td>
+    <td align="center">Home (dark, Russian)</td>
+    <td align="center">Settings</td>
+  </tr>
+</table>
+
+<img src="docs/screenshots/desktop.png" alt="Home screen in a desktop window with the menu open">
+
+Captured from the web build; other platforms look the same apart from the
+window frame.
+
 ## Requirements
 
 - Flutter **3.47.9** (pinned in `pubspec.yaml`; CI uses the same version).
@@ -70,6 +90,11 @@ git push origin v1.2.3
 
 Tags with a suffix such as `v1.2.3-beta.1` become pre-releases. The build
 number is the release workflow's run number, so it grows with every release.
+
+On iOS and macOS Flutter keeps only digits and dots of the version, so
+`1.2.3-beta.1` becomes `1.2.3.1` there. Unsigned builds don't mind, but the
+App Store accepts at most three numbers: avoid suffixes in versions you plan
+to submit to Apple.
 
 ### Android signing
 
