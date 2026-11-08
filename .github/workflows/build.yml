@@ -39,7 +39,7 @@ jobs:
           flutter-version-file: pubspec.yaml
           cache: true
       - run: flutter pub get
-      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: dart format --output=none --set-exit-if-changed lib test testing
       - run: flutter analyze
       - run: flutter test
 
@@ -72,7 +72,7 @@ jobs:
             # No signing: the .ipa has to be signed by a sideloading tool.
             build: ios --release --no-codesign
     env:
-      PACKAGE: flutter-base-${{ inputs.version-label }}-${{ matrix.target }}
+      PACKAGE: flutter-template-${{ inputs.version-label }}-${{ matrix.target }}
     defaults:
       run:
         shell: bash

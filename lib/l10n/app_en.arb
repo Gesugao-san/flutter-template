@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Flutter Base",
+  "appTitle": "Flutter Template",
   "@appTitle": {
     "description": "Application title shown in the window, task switcher and app bar."
   },
@@ -45,5 +45,33 @@
   "languageSystem": "System",
   "@languageSystem": {
     "description": "Language option: follow the operating system."
+  },
+  "welcomeTitle": "Welcome",
+  "@welcomeTitle": {
+    "description": "Title of the first-run welcome screen."
+  },
+  "welcomeBody": "Choose how the app looks. You can change this later in Settings.",
+  "@welcomeBody": {
+    "description": "Explanation on the welcome screen."
+  },
+  "getStarted": "Get started",
+  "@getStarted": {
+    "description": "Button that finishes the welcome screen."
+  },
+  "aboutTitle": "About",
+  "@aboutTitle": {
+    "description": "Menu item that opens the About dialog."
+  },
+  "aboutLegalese": "© 2026 Gesugao-san. MIT License.",
+  "@aboutLegalese": {
+    "description": "Copyright line in the About dialog."
+  },
+  "showWelcomeAgain": "Show welcome screen again",
+  "@showWelcomeAgain": {
+    "description": "Settings button that resets the first-run flag."
+  },
+  "saveFailed": "Couldn't save settings. Try again.",
+  "@saveFailed": {
+    "description": "Snack bar shown when saving settings fails."
   }
 }

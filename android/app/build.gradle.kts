@@ -17,7 +17,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "io.github.gesugaosan.flutter_base"
+    namespace = "io.github.gesugao_san.flutter_template"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         // Unique application ID; it cannot change after the first store release.
-        applicationId = "io.github.gesugaosan.flutter_base"
+        applicationId = "io.github.gesugao_san.flutter_template"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

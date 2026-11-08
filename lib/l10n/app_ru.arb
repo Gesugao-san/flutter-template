@@ -1,6 +1,6 @@
 {
   "@@locale": "ru",
-  "appTitle": "Flutter Base",
+  "appTitle": "Flutter Template",
   "helloWorld": "Привет, мир!",
   "runningOn": "Платформа: {platform}",
   "settingsTitle": "Настройки",
@@ -9,5 +9,12 @@
   "themeLight": "Светлая",
   "themeDark": "Тёмная",
   "languageLabel": "Язык",
-  "languageSystem": "Системный"
+  "languageSystem": "Системный",
+  "welcomeTitle": "Добро пожаловать",
+  "welcomeBody": "Выберите, как будет выглядеть приложение. Это можно изменить позже в настройках.",
+  "getStarted": "Начать",
+  "aboutTitle": "О приложении",
+  "aboutLegalese": "© 2026 Gesugao-san. Лицензия MIT.",
+  "showWelcomeAgain": "Показать приветствие снова",
+  "saveFailed": "Не удалось сохранить настройки. Попробуйте ещё раз."
 }

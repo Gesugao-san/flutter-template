@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "io.github.gesugaosan" "\0"
-            VALUE "FileDescription", "Flutter Base" "\0"
+            VALUE "CompanyName", "Gesugao-san" "\0"
+            VALUE "FileDescription", "Flutter Template" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutter_base" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 io.github.gesugaosan. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutter_base.exe" "\0"
-            VALUE "ProductName", "Flutter Base" "\0"
+            VALUE "InternalName", "flutter_template" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Gesugao-san. All rights reserved." "\0"
+            VALUE "OriginalFilename", "flutter_template.exe" "\0"
+            VALUE "ProductName", "Flutter Template" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,6 +1,6 @@
-# Flutter Base
+# Flutter Template
 
-[![CI](https://github.com/Gesugao-san/flutter-base/actions/workflows/ci.yml/badge.svg)](https://github.com/Gesugao-san/flutter-base/actions/workflows/ci.yml)
+[![CI](https://github.com/Gesugao-san/flutter-template/actions/workflows/ci.yml/badge.svg)](https://github.com/Gesugao-san/flutter-template/actions/workflows/ci.yml)
 
 A universal cross-platform starter: one Flutter code base that runs on
 **Android, iOS, Windows, macOS, Linux and the web**.
@@ -8,6 +8,13 @@ A universal cross-platform starter: one Flutter code base that runs on
 It is a localized "Hello, World!" that already contains the pieces most
 projects need:
 
+- **Official architecture**: structured after the
+  [Flutter app architecture guide](https://docs.flutter.dev/app-architecture)
+  and its [Compass sample](https://github.com/flutter/samples/tree/main/compass_app):
+  MVVM views and view models, repositories and services, `provider` for
+  dependency injection, `go_router` for navigation, commands for user actions.
+- **First-run welcome screen** for theme and language; afterwards settings
+  live in the home screen's "⋮" menu and are saved on the device.
 - **Material 3** light and dark themes from one seed color; the system theme
   is followed by default and can be overridden in the app.
 - **Localization** (English, Russian) generated from ARB files; the system
@@ -96,44 +103,62 @@ Apple platforms needs a paid Apple Developer account and is not set up here.
 
 ## Project structure
 
+UI code is grouped by feature, data code by type, as the architecture guide
+recommends:
+
 ```
 lib/
-  main.dart                  entry point
-  app.dart                   MaterialApp: theme, localization, settings
-  home/home_page.dart        the Hello World screen
-  settings/app_settings.dart theme mode and locale (ChangeNotifier + scope)
-  theme/app_theme.dart       light/dark Material 3 themes
-  platform/platform_name.dart human-readable platform name
-  l10n/app_en.arb            English strings (template)
-  l10n/app_ru.arb            Russian strings
-test/widget_test.dart        widget and unit tests
-.github/workflows/build.yml  reusable check + build + package pipeline
-.github/workflows/ci.yml     runs it on every push and pull request
-.github/workflows/release.yml publishes a release for version tags
+  main.dart                      entry point: loads settings, starts the UI
+  config/dependencies.dart       providers (services, repositories)
+  routing/                       go_router setup, route paths, first-run redirect
+  domain/models/                 immutable models (AppSettings, AppLanguage)
+  data/services/                 device storage (shared_preferences)
+  data/repositories/settings/    SettingsRepository (abstract) + local implementation
+  ui/app/                        root widget and its view model (theme, locale)
+  ui/core/                       shared themes and widgets
+  ui/home/                       home screen: view + view model
+  ui/onboarding/                 first-run welcome screen
+  ui/settings/                   settings screen
+  utils/                         Result, Command, helpers
+  l10n/                          ARB strings (English template, Russian)
+test/                            mirrors lib/
+testing/                         fakes and helpers shared by tests
+docs/                            project notes
+.github/workflows/build.yml      reusable check + build + package pipeline
+.github/workflows/ci.yml         runs it on every push and pull request
+.github/workflows/release.yml    publishes a release for version tags
 ```
+
+### Adding a feature
+
+1. Create `lib/ui/<feature>/view_models/<feature>_viewmodel.dart` with the
+   state and `Command`s, and `lib/ui/<feature>/widgets/<feature>_screen.dart`
+   that only displays it.
+2. Put data access in a repository under `lib/data/repositories/` (abstract
+   class + implementation) and register it in `config/dependencies.dart`.
+3. Add a route in `lib/routing/router.dart` that creates the view model with
+   `ChangeNotifierProvider`.
+4. Add a fake to `testing/fakes/` and tests under `test/` for the repository,
+   the view model and the screen.
 
 ## Using it as a base for a new project
 
 1. Use this repository as a template (or copy it).
-2. Rename the package: `name:` in `pubspec.yaml` and the `package:flutter_base`
-   imports in `test/`.
-3. Change the application ID: `io.github.gesugaosan.flutter_base` (Android
-   `applicationId`/`namespace`, Linux `APPLICATION_ID`) and
-   `io.github.gesugaosan.flutterBase` (iOS/macOS `PRODUCT_BUNDLE_IDENTIFIER`),
-   plus the display name "Flutter Base".
-4. Change `AppTheme.seedColor` to your brand color.
-5. Add strings to `lib/l10n/app_en.arb` first, then translate them in the
-   other ARB files.
-
-Settings are kept in memory only; add persistence (for example
-`shared_preferences`) when a project needs it.
+2. Rename the package: `name:` in `pubspec.yaml` and the
+   `package:flutter_template` imports in `test/` and `testing/`.
+3. Change the application identifiers, which differ between platforms:
+   see [docs/app-identifiers.md](docs/app-identifiers.md).
+4. Change the display name "Flutter Template" (`appTitle` in the ARB files,
+   platform runners) and `AppTheme.seedColor`.
+5. Replace the home screen with your own features; keep the welcome screen
+   as the place for first-run steps.
 
 ## Adding a language
 
 Create `lib/l10n/app_<code>.arb`, run `flutter pub get`, then add the language
-to `_Language` and `_languageLocales` in `lib/home/home_page.dart` and to
-`CFBundleLocalizations` in `ios/Runner/Info.plist` and
-`macos/Runner/Info.plist`.
+to `AppLanguage` in `lib/domain/models/app_settings.dart`, its label in
+`lib/ui/core/ui/appearance_settings.dart`, and to `CFBundleLocalizations` in
+`ios/Runner/Info.plist` and `macos/Runner/Info.plist`.
 
 ## License
 

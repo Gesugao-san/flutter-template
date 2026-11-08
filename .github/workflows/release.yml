@@ -56,7 +56,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          pattern: flutter-base-${{ github.ref_name }}-*
+          pattern: flutter-template-${{ github.ref_name }}-*
           path: dist
           merge-multiple: true
 
@@ -75,8 +75,8 @@ jobs:
           | Platform | File | Notes |
           |---|---|---|
           | Android | `*-android.apk` | Install directly; allow installs from unknown sources. |
-          | Windows | `*-windows.zip` | Unpack and run `flutter_base.exe`. |
-          | Linux | `*-linux.tar.gz` | Unpack and run `flutter_base` (needs GTK 3). |
+          | Windows | `*-windows.zip` | Unpack and run `flutter_template.exe`. |
+          | Linux | `*-linux.tar.gz` | Unpack and run `flutter_template` (needs GTK 3). |
           | macOS | `*-macos.zip` | Not notarized: right-click the app and choose Open. |
           | iOS | `*-ios-unsigned.ipa` | Unsigned: install with a sideloading tool that signs it. |
           | Web | `*-web.zip` | Static site: serve the folder with any web server. |
