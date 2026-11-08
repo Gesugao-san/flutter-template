@@ -1,0 +1,49 @@
+{
+  "@@locale": "en",
+  "appTitle": "Flutter Base",
+  "@appTitle": {
+    "description": "Application title shown in the window, task switcher and app bar."
+  },
+  "helloWorld": "Hello, World!",
+  "@helloWorld": {
+    "description": "Main greeting on the home page."
+  },
+  "runningOn": "Running on {platform}",
+  "@runningOn": {
+    "description": "Subtitle telling which platform the app runs on.",
+    "placeholders": {
+      "platform": {
+        "type": "String",
+        "example": "Android"
+      }
+    }
+  },
+  "settingsTitle": "Settings",
+  "@settingsTitle": {
+    "description": "Header of the settings section."
+  },
+  "themeLabel": "Theme",
+  "@themeLabel": {
+    "description": "Label of the theme selector."
+  },
+  "themeSystem": "System",
+  "@themeSystem": {
+    "description": "Theme option: follow the operating system."
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Theme option: always light."
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Theme option: always dark."
+  },
+  "languageLabel": "Language",
+  "@languageLabel": {
+    "description": "Label of the language selector."
+  },
+  "languageSystem": "System",
+  "@languageSystem": {
+    "description": "Language option: follow the operating system."
+  }
+}

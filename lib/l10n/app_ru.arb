@@ -1,0 +1,13 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Flutter Base",
+  "helloWorld": "Привет, мир!",
+  "runningOn": "Платформа: {platform}",
+  "settingsTitle": "Настройки",
+  "themeLabel": "Тема",
+  "themeSystem": "Системная",
+  "themeLight": "Светлая",
+  "themeDark": "Тёмная",
+  "languageLabel": "Язык",
+  "languageSystem": "Системный"
+}

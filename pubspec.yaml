@@ -1,0 +1,30 @@
+name: flutter_base
+description: "Universal cross-platform Flutter starter."
+publish_to: 'none'
+
+# Format: <major>.<minor>.<patch>+<build number>.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.7
+  # Exact Flutter version used by CI (read by subosito/flutter-action).
+  flutter: 3.47.9
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  # Provides CupertinoIcons, referenced by the framework's adaptive widgets.
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  # Generates AppLocalizations from lib/l10n/*.arb (see l10n.yaml).
+  generate: true
