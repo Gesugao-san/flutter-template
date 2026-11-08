@@ -3,7 +3,7 @@ description: "Universal cross-platform Flutter starter."
 publish_to: 'none'
 
 # Format: <major>.<minor>.<patch>+<build number>.
-version: 1.0.0+1
+version: 0.1.0-test.1+1
 
 environment:
   sdk: ^3.13.7
