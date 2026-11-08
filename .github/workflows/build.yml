@@ -1,0 +1,169 @@
+# Reusable pipeline: checks the code, then builds and packages the app for
+# all six platforms. Called by ci.yml (every push) and release.yml (tags).
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      version-label:
+        description: Label used in package file names, e.g. v1.2.3.
+        type: string
+        default: dev
+      build-number:
+        description: Build number for `flutter build`; empty keeps pubspec.yaml's.
+        type: string
+        default: ''
+    secrets:
+      ANDROID_KEYSTORE_BASE64:
+        description: Base64-encoded upload keystore (.jks) for Android signing.
+        required: false
+      ANDROID_KEYSTORE_PASSWORD:
+        required: false
+      ANDROID_KEY_ALIAS:
+        required: false
+      ANDROID_KEY_PASSWORD:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Format, analyze, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          # The exact Flutter version is pinned in pubspec.yaml.
+          flutter-version-file: pubspec.yaml
+          cache: true
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: check
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: android
+            os: ubuntu-latest
+            build: apk --release
+          - target: web
+            os: ubuntu-latest
+            # Renderer is bundled with the app instead of loaded from a CDN.
+            build: web --release --wasm --no-web-resources-cdn
+          - target: linux
+            os: ubuntu-latest
+            build: linux --release
+          - target: windows
+            os: windows-latest
+            build: windows --release
+          - target: macos
+            os: macos-latest
+            build: macos --release
+          - target: ios
+            os: macos-latest
+            # No signing: the .ipa has to be signed by a sideloading tool.
+            build: ios --release --no-codesign
+    env:
+      PACKAGE: flutter-base-${{ inputs.version-label }}-${{ matrix.target }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Java
+        if: matrix.target == 'android'
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Linux desktop dependencies
+        if: matrix.target == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: pubspec.yaml
+          cache: true
+
+      - name: Configure Android release signing
+        if: matrix.target == 'android'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::Android signing secrets are not set; the APK is signed with a throwaway debug key and cannot update a previous install."
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          {
+            echo "storeFile=upload-keystore.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > android/key.properties
+
+      - run: flutter pub get
+
+      - name: Build
+        env:
+          BUILD_NUMBER: ${{ inputs.build-number }}
+        run: flutter build ${{ matrix.build }} ${BUILD_NUMBER:+--build-number=$BUILD_NUMBER}
+
+      - name: Package
+        run: |
+          mkdir -p dist stage
+          case "${{ matrix.target }}" in
+            android)
+              cp build/app/outputs/flutter-apk/app-release.apk "dist/$PACKAGE.apk"
+              ;;
+            web)
+              (cd build/web && zip -qr "$GITHUB_WORKSPACE/dist/$PACKAGE.zip" .)
+              ;;
+            linux)
+              cp -R build/linux/x64/release/bundle "stage/$PACKAGE"
+              tar -czf "dist/$PACKAGE.tar.gz" -C stage "$PACKAGE"
+              ;;
+            windows)
+              cp -R build/windows/x64/runner/Release "stage/$PACKAGE"
+              # Bundle the MSVC runtime so the app starts on clean systems.
+              for dll in msvcp140.dll vcruntime140.dll vcruntime140_1.dll; do
+                cp "/c/Windows/System32/$dll" "stage/$PACKAGE/"
+              done
+              (cd stage && 7z a -tzip -bso0 "$GITHUB_WORKSPACE/dist/$PACKAGE.zip" "$PACKAGE")
+              ;;
+            macos)
+              ditto -c -k --keepParent build/macos/Build/Products/Release/*.app "dist/$PACKAGE.zip"
+              ;;
+            ios)
+              mkdir -p stage/Payload
+              cp -R build/ios/iphoneos/Runner.app stage/Payload/
+              (cd stage && zip -qry "$GITHUB_WORKSPACE/dist/$PACKAGE-unsigned.ipa" Payload)
+              ;;
+            *)
+              echo "::error::No packaging rule for target ${{ matrix.target }}"
+              exit 1
+              ;;
+          esac
+          ls -l dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.PACKAGE }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14

@@ -47,8 +47,52 @@ flutter test
 | Web | `flutter build web --release --wasm --no-web-resources-cdn` | `build/web/` |
 
 Every push to `main` builds all of them in CI; download the results from the
-run's **Artifacts** section. The Android APK is signed with the debug key and
-the iOS app is unsigned: fine for testing, not for store publishing.
+run's **Artifacts** section.
+
+## Releases
+
+Pushing a version tag publishes a GitHub Release with ready-to-use packages
+for all six platforms and a `SHA256SUMS.txt`:
+
+```sh
+# 1. Set the same version in pubspec.yaml (`version: 1.2.3+1`) and commit it.
+# 2. Tag and push; the workflow refuses tags that differ from pubspec.yaml.
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+Tags with a suffix such as `v1.2.3-beta.1` become pre-releases. The build
+number is the release workflow's run number, so it grows with every release.
+
+### Android signing
+
+Without signing secrets the release APK is signed with a throwaway debug key
+that CI generates anew on every run, so a newer APK **cannot update** an
+installed older one. Create an upload key once and keep it safe; losing it
+means users have to reinstall the app:
+
+```sh
+keytool -genkeypair -v -keystore upload-keystore.jks -storetype JKS \
+  -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+base64 -w0 upload-keystore.jks   # value for ANDROID_KEYSTORE_BASE64
+```
+
+Then add repository secrets (Settings → Secrets and variables → Actions):
+`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`,
+`ANDROID_KEY_PASSWORD`. For local signed builds put the same values into
+`android/key.properties` (git-ignored):
+
+```properties
+storeFile=upload-keystore.jks
+storePassword=...
+keyAlias=upload
+keyPassword=...
+```
+
+### Apple platforms
+
+The macOS app is not notarized and the iOS `.ipa` is unsigned: signing for
+Apple platforms needs a paid Apple Developer account and is not set up here.
 
 ## Project structure
 
@@ -63,7 +107,9 @@ lib/
   l10n/app_en.arb            English strings (template)
   l10n/app_ru.arb            Russian strings
 test/widget_test.dart        widget and unit tests
-.github/workflows/ci.yml     CI pipeline
+.github/workflows/build.yml  reusable check + build + package pipeline
+.github/workflows/ci.yml     runs it on every push and pull request
+.github/workflows/release.yml publishes a release for version tags
 ```
 
 ## Using it as a base for a new project

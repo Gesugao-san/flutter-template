@@ -1,0 +1,91 @@
+# Publishes a GitHub Release with packages for all platforms when a version
+# tag is pushed, e.g. `git tag v1.2.3 && git push origin v1.2.3`.
+# Tags with a suffix (v1.2.3-beta.1) are published as pre-releases.
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+# Never run two releases of the same tag at once.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify version
+    runs-on: ubuntu-latest
+    outputs:
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check that the tag matches pubspec.yaml
+        id: version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          pubspec_version="$(sed -n 's/^version:[[:space:]]*\([^+[:space:]]*\).*/\1/p' pubspec.yaml)"
+          if [ "$tag_version" != "$pubspec_version" ]; then
+            echo "::error file=pubspec.yaml::Tag $GITHUB_REF_NAME does not match pubspec.yaml version $pubspec_version. Update 'version:' first."
+            exit 1
+          fi
+
+          prerelease=false
+          if [[ "$tag_version" == *-* ]]; then prerelease=true; fi
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: verify
+    uses: ./.github/workflows/build.yml
+    with:
+      version-label: ${{ github.ref_name }}
+      # Grows with every release run, so Android/iOS accept each update.
+      build-number: ${{ github.run_number }}
+    secrets: inherit
+
+  publish:
+    name: Publish release
+    needs: [verify, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: flutter-base-${{ github.ref_name }}-*
+          path: dist
+          merge-multiple: true
+
+      - name: Write checksums
+        working-directory: dist
+        run: sha256sum -- * > SHA256SUMS.txt
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ needs.verify.outputs.prerelease }}
+        run: |
+          cat > notes.md <<'EOF'
+          ## Downloads
+
+          | Platform | File | Notes |
+          |---|---|---|
+          | Android | `*-android.apk` | Install directly; allow installs from unknown sources. |
+          | Windows | `*-windows.zip` | Unpack and run `flutter_base.exe`. |
+          | Linux | `*-linux.tar.gz` | Unpack and run `flutter_base` (needs GTK 3). |
+          | macOS | `*-macos.zip` | Not notarized: right-click the app and choose Open. |
+          | iOS | `*-ios-unsigned.ipa` | Unsigned: install with a sideloading tool that signs it. |
+          | Web | `*-web.zip` | Static site: serve the folder with any web server. |
+
+          Verify downloads with `SHA256SUMS.txt`.
+
+          EOF
+
+          flags=(--verify-tag --title "$GITHUB_REF_NAME" --notes-file notes.md --generate-notes)
+          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
+
+          gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" "${flags[@]}"
