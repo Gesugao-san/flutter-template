@@ -109,7 +109,8 @@ jobs:
             echo "::warning::Android signing secrets are not set; the APK is signed with a throwaway debug key and cannot update a previous install."
             exit 0
           fi
-          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload-keystore.jks
+          # Strip CR/LF/spaces: secrets pasted on Windows may end with "\r\n".
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 --decode > android/app/upload-keystore.jks
           {
             echo "storeFile=upload-keystore.jks"
             echo "storePassword=$KEYSTORE_PASSWORD"
