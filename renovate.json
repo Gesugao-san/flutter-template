@@ -10,9 +10,10 @@
       "dependencyDashboardApproval": true
     },
     {
-      "description": "CI builds Android with JDK 17, the Java level the app targets.",
+      "description": "CI builds Android with JDK 17, the Java level the app targets; no major JDK updates.",
       "matchDepNames": ["java-jdk"],
-      "allowedVersions": "<18"
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }
