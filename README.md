@@ -76,6 +76,12 @@ flutter test
 Every push to `main` builds all of them in CI; download the results from the
 run's **Artifacts** section.
 
+The web build is also published to GitHub Pages on every push to `main`
+(`https://<user>.github.io/<repository>/`). Enable it once in
+Settings → Pages → Source: **GitHub Actions**. Flutter on the web draws
+everything through WebGL: a browser without working WebGL shows a blank
+page.
+
 ## Releases
 
 Pushing a version tag publishes a GitHub Release with ready-to-use packages
