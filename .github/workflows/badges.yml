@@ -1,0 +1,61 @@
+# Refreshes the README downloads badges: every day and after each release.
+#
+# tool/update_badges.py writes shields.io endpoint JSON files for the latest
+# release; this workflow publishes them as the only commit of the `badges`
+# branch, which README.md reads through raw.githubusercontent.com.
+name: Badges
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # every day at 00:00 UTC (GMT)
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: write
+
+# Never let two updates race on the branch.
+concurrency:
+  group: badges
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Update badges
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Generate badge data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tool/update_badges.py badges-out
+
+      - name: Publish to the badges branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          files=(badges-out/*.json)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "::notice::No published release yet; badges left unchanged."
+            exit 0
+          fi
+
+          cd badges-out
+          git init -q -b badges
+          git add -- *.json
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+          # Skip the push when the published files are already identical.
+          if git fetch -q --depth=1 "$remote" badges 2>/dev/null \
+            && [ "$(git rev-parse 'FETCH_HEAD^{tree}')" = "$(git write-tree)" ]; then
+            echo "Badges unchanged."
+            exit 0
+          fi
+
+          # One commit, force-pushed: the branch keeps no history to grow.
+          git -c user.name='github-actions[bot]' \
+            -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit -q -m "Update badges"
+          git push -q -f "$remote" HEAD:badges

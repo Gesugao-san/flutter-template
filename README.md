@@ -26,6 +26,33 @@ projects need:
 - **Self-contained web build**: the renderer is bundled with the app
   (`--no-web-resources-cdn`), nothing is loaded from Google's CDN.
 
+## Downloads
+
+[![Latest release](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Frelease.json)](https://github.com/Gesugao-san/flutter-template/releases/latest)
+![Release date](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Freleased.json)
+[![Downloads](https://img.shields.io/github/downloads/Gesugao-san/flutter-template/total)](https://github.com/Gesugao-san/flutter-template/releases)
+![APK signer](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fsigned.json)
+
+| Platform · minimum | Size | Download |
+|---|---|---|
+| ![Android](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fandroid.json) | ![Android size](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fandroid-size.json) | [![Download Android](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fandroid-downloads.json)](https://github.com/Gesugao-san/flutter-template/releases/latest/download/flutter-template-android.apk) |
+| ![Windows](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fwindows.json) | ![Windows size](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fwindows-size.json) | [![Download Windows](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fwindows-downloads.json)](https://github.com/Gesugao-san/flutter-template/releases/latest/download/flutter-template-windows.zip) |
+| ![macOS](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fmacos.json) | ![macOS size](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fmacos-size.json) | [![Download macOS](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fmacos-downloads.json)](https://github.com/Gesugao-san/flutter-template/releases/latest/download/flutter-template-macos.zip) |
+| ![Linux](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Flinux.json) | ![Linux size](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Flinux-size.json) | [![Download Linux](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Flinux-downloads.json)](https://github.com/Gesugao-san/flutter-template/releases/latest/download/flutter-template-linux.tar.gz) |
+| ![iOS](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fios.json) | ![iOS size](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fios-size.json) | [![Download iOS](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fios-downloads.json)](https://github.com/Gesugao-san/flutter-template/releases/latest/download/flutter-template-ios-unsigned.ipa) |
+| ![Web](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fweb.json) | ![Web size](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fweb-size.json) | [![Open in browser](https://img.shields.io/badge/open-in_browser-2ea44f?logo=github)](https://gesugao-san.github.io/flutter-template/) [![Download Web](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FGesugao-san%2Fflutter-template%2Fbadges%2Fweb-downloads.json)](https://github.com/Gesugao-san/flutter-template/releases/latest/download/flutter-template-web.zip) |
+
+The buttons always point to the latest release; pre-releases are on the
+[releases page](https://github.com/Gesugao-san/flutter-template/releases). Every release lists `SHA256SUMS.txt` for
+verifying downloads.
+
+These badges are generated, not hand-written: the release workflow reads
+minimum OS versions and the APK signer from the built files, and
+`tool/update_badges.py` turns them, together with file sizes and per-file
+download counts, into [shields.io endpoint](https://shields.io/badges/endpoint-badge)
+JSON on the `badges` branch. The Badges workflow refreshes them after every
+release and daily at 00:00 UTC.
+
 ## Screenshots
 
 <table>
@@ -176,7 +203,8 @@ docs/                            project notes
 
 1. Use this repository as a template (or copy it).
 2. Rename the package: `name:` in `pubspec.yaml` and the
-   `package:flutter_template` imports in `test/` and `testing/`.
+   `package:flutter_template` imports in `test/` and `testing/`. Replace
+   `Gesugao-san/flutter-template` in this README (badges and links).
 3. Change the application identifiers, which differ between platforms:
    see [docs/app-identifiers.md](docs/app-identifiers.md).
 4. Change the display name "Flutter Template" (`appTitle` in the ARB files,

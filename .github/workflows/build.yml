@@ -5,10 +5,6 @@ name: Build
 on:
   workflow_call:
     inputs:
-      version-label:
-        description: Label used in package file names, e.g. v1.2.3.
-        type: string
-        default: dev
       build-number:
         description: Build number for `flutter build`; empty keeps pubspec.yaml's.
         type: string
@@ -72,7 +68,9 @@ jobs:
             # No signing: the .ipa has to be signed by a sideloading tool.
             build: ios --release --no-codesign
     env:
-      PACKAGE: flutter-template-${{ inputs.version-label }}-${{ matrix.target }}
+      # Version-free names keep `releases/latest/download/<file>` links
+      # stable (see the Downloads table in README.md).
+      PACKAGE: ${{ github.event.repository.name }}-${{ matrix.target }}
     defaults:
       run:
         shell: bash
@@ -161,6 +159,34 @@ jobs:
               ;;
           esac
           ls -l dist
+
+      - name: Collect metadata for README badges
+        # Values come from the built files, so badges never drift from reality.
+        run: |
+          meta="dist/$PACKAGE.meta.json"
+          case "${{ matrix.target }}" in
+            android)
+              tools="$(printf '%s\n' "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+              apk="dist/$PACKAGE.apk"
+              api="$("$tools/aapt2" dump badging "$apk" | sed -nE "s/^(minSdkVersion|sdkVersion):'([0-9]+)'.*/\2/p")"
+              signer="$("$tools/apksigner" verify --print-certs "$apk" | sed -n 's/^Signer #1 certificate DN: CN=\([^,]*\).*/\1/p')"
+              jq -n --argjson api "$api" --arg signer "$signer" '{min_api: $api, signer: $signer}' > "$meta"
+              ;;
+            ios)
+              min="$(plutil -extract MinimumOSVersion raw build/ios/iphoneos/Runner.app/Info.plist)"
+              jq -n --arg min "$min" '{min_os: $min}' > "$meta"
+              ;;
+            macos)
+              apps=(build/macos/Build/Products/Release/*.app)
+              app="${apps[0]}"
+              min="$(plutil -extract LSMinimumSystemVersion raw "$app/Contents/Info.plist")"
+              jq -n --arg min "$min" '{min_os: $min}' > "$meta"
+              ;;
+            *)
+              echo '{}' > "$meta"
+              ;;
+          esac
+          cat "$meta"
 
       - uses: actions/upload-artifact@v7
         with:

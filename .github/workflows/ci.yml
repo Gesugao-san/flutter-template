@@ -19,5 +19,3 @@ jobs:
   build:
     # Signing secrets are not passed: CI builds are for checking only.
     uses: ./.github/workflows/build.yml
-    with:
-      version-label: dev

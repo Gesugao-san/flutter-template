@@ -42,7 +42,6 @@ jobs:
     needs: verify
     uses: ./.github/workflows/build.yml
     with:
-      version-label: ${{ github.ref_name }}
       # Grows with every release run, so Android/iOS accept each update.
       build-number: ${{ github.run_number }}
     secrets: inherit
@@ -56,9 +55,21 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          pattern: flutter-template-${{ github.ref_name }}-*
+          pattern: ${{ github.event.repository.name }}-*
           path: dist
           merge-multiple: true
+
+      - name: Merge build metadata into release-info.json
+        # Read by tool/update_badges.py for the README badges.
+        working-directory: dist
+        env:
+          PREFIX: ${{ github.event.repository.name }}-
+        run: |
+          jq -n --arg prefix "$PREFIX" \
+            'reduce inputs as $meta ({}; . + {(input_filename | ltrimstr("./") | ltrimstr($prefix) | rtrimstr(".meta.json")): $meta})' \
+            ./*.meta.json > release-info.json
+          rm -- ./*.meta.json
+          cat release-info.json
 
       - name: Write checksums
         working-directory: dist
@@ -89,3 +100,10 @@ jobs:
           if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
 
           gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" "${flags[@]}"
+
+  badges:
+    name: Refresh README badges
+    needs: publish
+    uses: ./.github/workflows/badges.yml
+    permissions:
+      contents: write
